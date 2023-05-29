@@ -30,7 +30,6 @@ cd foo
 docker build -t foo -f Dockerfile .
 kubectl apply -f deployment.yaml
 kubectl apply -f peerauth.yaml
-kubectl apply -f authz.yaml
 ```
 
 5. Build & deploy bar service:
@@ -41,7 +40,6 @@ cd bar
 docker build -t bar -f Dockerfile .
 kubectl apply -f deployment.yaml
 kubectl apply -f peerauth.yaml
-kubectl apply -f destinationrule.yaml
 ```
 
 6. Build & deploy legacy service:
@@ -51,4 +49,63 @@ eval $(minikube docker-env)
 cd legacy
 docker build -t legacy -f Dockerfile .
 kubectl apply -f deployment.yaml
+```
+
+Results:
+
+```
+foo --> foo: ok
+foo --> bar: ok
+foo --> legacy: ok
+bar --> foo: ok
+bar --> bar: ok
+bar --> legacy: ok
+legacy --> foo: error
+legacy --> bar: ok
+legacy --> legacy: ok
+```
+
+7. Use DestinationRule to disable mTLS between bar -> foo
+
+```
+cd bar
+kubectl apply -f destinationrule.yaml
+```
+
+Results:
+
+```
+foo --> foo: ok
+foo --> bar: ok
+foo --> legacy: ok
+bar --> foo: error
+bar --> bar: ok
+bar --> legacy: ok
+legacy --> foo: error
+legacy --> bar: ok
+legacy --> legacy: ok
+```
+
+8. Use AuthorizationPolicy to deny request bar -> foo
+
+```
+cd bar
+kubectl delete -f destinationrule.yaml
+
+cd foo
+kubectl apply -f authz.yaml
+```
+
+Results:
+
+```
+foo --> foo: ok
+foo --> bar: ok
+foo --> legacy: ok
+bar --> foo: denied
+bar --> bar: ok
+bar --> legacy: ok
+legacy --> foo: error
+legacy --> bar: ok
+legacy --> legacy: ok
 ```
