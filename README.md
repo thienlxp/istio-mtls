@@ -29,6 +29,8 @@ eval $(minikube docker-env)
 cd foo
 docker build -t foo -f Dockerfile .
 kubectl apply -f deployment.yaml
+kubectl apply -f peerauth.yaml
+kubectl apply -f authz.yaml
 ```
 
 5. Build & deploy bar service:
@@ -38,6 +40,8 @@ eval $(minikube docker-env)
 cd bar
 docker build -t bar -f Dockerfile .
 kubectl apply -f deployment.yaml
+kubectl apply -f peerauth.yaml
+kubectl apply -f destinationrule.yaml
 ```
 
 6. Build & deploy legacy service:
