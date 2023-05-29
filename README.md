@@ -4,14 +4,23 @@
 minikube start --memory 8192
 ```
 
-2. Install istio
+2. Check current context and save the value for later
+```
+export PRE_CTX=$(kubectl config current-context)
+```
+3. Switch context to "minikube" at your local
+```
+kubectl config use-context minikube
+```
+
+4. Install istio
 
 ```
 brew install istioctl
 istioctl install --set profile=demo -y --set values.global.proxy.privileged=true
 ```
 
-3. Prepare namespaces
+5. Prepare namespaces
 
 ```
 kubectl create namespace foo
@@ -22,7 +31,7 @@ kubectl label namespace foo istio-injection=enabled
 kubectl label namespace bar istio-injection=enabled
 ```
 
-4. Build & deploy foo service:
+6. Build & deploy foo service:
 
 ```
 eval $(minikube docker-env)
@@ -32,7 +41,7 @@ kubectl apply -f deployment.yaml
 kubectl apply -f peerauth.yaml
 ```
 
-5. Build & deploy bar service:
+7. Build & deploy bar service:
 
 ```
 eval $(minikube docker-env)
@@ -42,7 +51,7 @@ kubectl apply -f deployment.yaml
 kubectl apply -f peerauth.yaml
 ```
 
-6. Build & deploy legacy service:
+8. Build & deploy legacy service:
 
 ```
 eval $(minikube docker-env)
@@ -65,7 +74,7 @@ legacy --> bar: ok
 legacy --> legacy: ok
 ```
 
-7. Use DestinationRule to disable mTLS between bar -> foo
+9. Use DestinationRule to disable mTLS between bar -> foo
 
 ```
 cd bar
@@ -86,7 +95,7 @@ legacy --> bar: ok
 legacy --> legacy: ok
 ```
 
-8. Use AuthorizationPolicy to deny request bar -> foo
+10. Use AuthorizationPolicy to deny request bar -> foo
 
 ```
 cd bar
@@ -108,4 +117,8 @@ bar --> legacy: ok
 legacy --> foo: error
 legacy --> bar: ok
 legacy --> legacy: ok
+```
+11. Switch context back to previous
+```
+kubectl config use-context $PRE_CTX
 ```
