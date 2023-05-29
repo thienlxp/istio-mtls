@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: foo-authz
+  namespace: foo
+spec:
+  action: DENY
+  rules:
+    - from:
+        - source:
+            principals: ["cluster.local/ns/bar/sa/default"]
+          # - source:
+          #     namespaces: ["bar"]
+    - to:
+        # - operation:
+        #     ports: ["8080"]
