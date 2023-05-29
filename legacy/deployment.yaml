@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: legacy
+  name: legacy-service
+  labels:
+    app: legacy-service
+    service: legacy-service
+spec:
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    app: legacy-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: legacy
+  name: legacy-service
+  labels:
+    app: legacy-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: legacy-service
+  template:
+    metadata:
+      labels:
+        app: legacy-service
+    spec:
+      containers:
+        - name: legacy
+          image: legacy
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080

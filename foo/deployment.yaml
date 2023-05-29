@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: foo
+  name: foo-service
+  labels:
+    app: foo-service
+    service: foo-service
+spec:
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    app: foo-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: foo
+  name: foo-service
+  labels:
+    app: foo-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: foo-service
+  template:
+    metadata:
+      labels:
+        app: foo-service
+    spec:
+      containers:
+        - name: foo
+          image: foo
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080

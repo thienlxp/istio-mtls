@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: bar
+  name: bar-service
+  labels:
+    app: bar-service
+    service: bar-service
+spec:
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    app: bar-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: bar
+  name: bar-service
+  labels:
+    app: bar-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bar-service
+  template:
+    metadata:
+      labels:
+        app: bar-service
+    spec:
+      containers:
+        - name: bar
+          image: bar
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
